@@ -1,3 +1,130 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BikeFlow | Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-layout">
 
+        <aside class="sidebar">
+            <div class="brand">
+                <h2>BikeFlow</h2>
+                <p class="brand-subtitle">Bicycle Service Management</p>
+            </div>
+
+            <p class="sidebar-label">MENU</p>
+
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-link active">Dashboard</a>
+                <a href="orders.html" class="nav-link">Repair Orders</a>
+                <a href="create-order.html" class="nav-link">Create Order</a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <p>BikeFlow MVP</p>
+            </div>
+        </aside>
+
+        <main class="main-content">
+
+            <header class="topbar">
+                <div>
+                    <h1 class="topbar-title">Dashboard</h1>
+                    <p class="topbar-subtitle">Overview of your bicycle repair service</p>
+                </div>
+
+                <div class="user-profile">
+                    <div class="user-avatar">A</div>
+                    <span>Augusta</span>
+                </div>
+            </header>
+
+            <section class="container">
+
+                <div class="page-header">
+                    <div>
+                        <h2 class="page-title">Welcome to BikeFlow</h2>
+                        <p class="page-description">
+                            Monitor and manage your bicycle repair orders.
+                        </p>
+                    </div>
+
+                    <a href="create-order.html" class="btn btn-primary">
+                        + Create New Order
+                    </a>
+                </div>
+
+                <div class="stats-grid">
+                    <article class="stat-card">
+                        <p class="stat-label">Total Orders</p>
+                        <h3 class="stat-value" id="total-orders">—</h3>
+                        <p class="stat-note">All repair orders</p>
+                    </article>
+
+                    <article class="stat-card">
+                        <p class="stat-label">Registered</p>
+                        <h3 class="stat-value" id="registered-orders">—</h3>
+                        <p class="stat-note">New repair orders</p>
+                    </article>
+
+                    <article class="stat-card">
+                        <p class="stat-label">In Progress</p>
+                        <h3 class="stat-value" id="in-progress-orders">—</h3>
+                        <p class="stat-note">Currently being repaired</p>
+                    </article>
+
+                    <article class="stat-card">
+                        <p class="stat-label">Completed</p>
+                        <h3 class="stat-value" id="completed-orders">—</h3>
+                        <p class="stat-note">Finished repairs</p>
+                    </article>
+                </div>
+
+                <section class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recent Repair Orders</h3>
+                        <a href="orders.html" class="btn btn-secondary">
+                            View All Orders
+                        </a>
+                    </div>
+
+                    <div id="dashboard-message" class="alert alert-info">
+                        Loading repair orders...
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Bicycle</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="recent-orders-table">
+                                <tr>
+                                    <td colspan="6">Loading orders...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <footer class="page-footer">
+                    BikeFlow Bicycle Service Management System
+                </footer>
+
+            </section>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
 </html>
