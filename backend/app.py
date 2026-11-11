@@ -1,10 +1,20 @@
+
 from flask import Flask, jsonify
 from flask_cors import CORS
 
+from backend.routes.orders import orders_bp
+from database.db_connection import initialize_database
+
 app = Flask(__name__)
 
-# Allow the frontend to communicate with the backend
+# Initialize SQLite when the application starts
+initialize_database()
+
+# Allow communication with the frontend
 CORS(app)
+
+# Register repair order API routes
+app.register_blueprint(orders_bp, url_prefix="/api")
 
 
 @app.route("/", methods=["GET"])
