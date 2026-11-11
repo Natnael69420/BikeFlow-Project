@@ -1,1 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BikeFlow | Repair Orders</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-layout">
 
+        <aside class="sidebar">
+            <div class="brand">
+                <h2>BikeFlow</h2>
+                <p class="brand-subtitle">Bicycle Service Management</p>
+            </div>
+
+            <p class="sidebar-label">MENU</p>
+
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-link">Dashboard</a>
+                <a href="orders.html" class="nav-link active">Repair Orders</a>
+                <a href="create-order.html" class="nav-link">Create Order</a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <p>BikeFlow MVP</p>
+            </div>
+        </aside>
+
+        <main class="main-content">
+
+            <header class="topbar">
+                <div>
+                    <h1 class="topbar-title">Repair Orders</h1>
+                    <p class="topbar-subtitle">View and manage bicycle repair orders</p>
+                </div>
+
+                <div class="user-profile">
+                    <div class="user-avatar">A</div>
+                    <span>Augusta</span>
+                </div>
+            </header>
+
+            <section class="container">
+
+                <div class="page-header">
+                    <div>
+                        <h2 class="page-title">All Repair Orders</h2>
+                        <p class="page-description">
+                            Browse the repair orders registered in BikeFlow.
+                        </p>
+                    </div>
+
+                    <a href="create-order.html" class="btn btn-primary">
+                        + Create New Order
+                    </a>
+                </div>
+
+                <section class="card">
+
+                    <div class="toolbar">
+                        <input
+                            type="search"
+                            id="order-search"
+                            class="search-input"
+                            placeholder="Search by customer or bicycle..."
+                            aria-label="Search repair orders"
+                        >
+
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            id="refresh-orders"
+                        >
+                            Refresh
+                        </button>
+                    </div>
+
+                    <div id="orders-message" class="alert alert-info">
+                        Loading repair orders...
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Phone</th>
+                                    <th>Bicycle</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="orders-table-body">
+                                <tr>
+                                    <td colspan="7">Loading orders...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </section>
+
+                <footer class="page-footer">
+                    BikeFlow Bicycle Service Management System
+                </footer>
+
+            </section>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const tableBody = document.getElementById("orders-table-body");
+            const message = document.getElementById("orders-message");
+            const searchInput = document.getElementById("order-search");
+            const refreshButton = document.getElementById("refresh-orders");
+
+            let allOrders = [];
+
+            function showMessage(text, type = "info") {
+                message.textContent = text;
+                message.className = `alert alert-${type}`;
+            }
+
+            function renderOrders(orders) {
+                if (orders.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7">No repair orders found.</td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                tableBody.innerHTML = orders.map(order => {
+                    const bicycle = [
+                        order.bicycle_brand,
+                        order.bicycle_type
+                    ].filter(Boolean).join(" ");
+
+                    const statusClass =
+                        BikeFlow.getStatusClass(order.status);
+
+                    return `
+                        <tr>
+                            <td>#${BikeFlow.escapeHtml(order.id)}</td>
+                            <td>${BikeFlow.escapeHtml(order.customer_name)}</td>
+                            <td>${BikeFlow.escapeHtml(order.customer_phone)}</td>
+                            <td>${BikeFlow.escapeHtml(bicycle || "—")}</td>
+                            <td>
+                                <span class="${statusClass}">
+                                    ${BikeFlow.escapeHtml(order.status)}
+                                </span>
+                            </td>
+                            <td>
+                                ${BikeFlow.escapeHtml(
+                                    BikeFlow.formatDate(order.created_at)
+                                )}
+                            </td>
+                            <td>
+                                <a href="order.html?id=${encodeURIComponent(order.id)}">
+                                    View
+                                </a>
+                            </td>
+                        </tr>
+                    `;
+                }).join("");
+            }
+
+            function filterOrders() {
+                const searchTerm = searchInput.value
+                    .trim()
+                    .toLowerCase();
+
+                const filteredOrders = allOrders.filter(order => {
+                    const searchableText = [
+                        order.id,
+                        order.customer_name,
+                        order.customer_phone,
+                        order.bicycle_brand,
+                        order.bicycle_type
+                    ].join(" ").toLowerCase();
+
+                    return searchableText.includes(searchTerm);
+                });
+
+                renderOrders(filteredOrders);
+            }
+
+            async function loadOrders() {
+                showMessage("Loading repair orders...");
+
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7">Loading orders...</td>
+                    </tr>
+                `;
+
+                try {
+                    allOrders = await BikeFlow.getOrders();
+
+                    filterOrders();
+
+                    showMessage(
+                        `Successfully loaded ${allOrders.length} repair order(s).`,
+                        "success"
+                    );
+
+                } catch (error) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7">
+                                Unable to load repair orders.
+                            </td>
+                        </tr>
+                    `;
+
+                    showMessage(error.message, "error");
+                }
+            }
+
+            searchInput.addEventListener("input", filterOrders);
+            refreshButton.addEventListener("click", loadOrders);
+
+            loadOrders();
+        });
+    </script>
+</body>
+</html>
