@@ -352,6 +352,19 @@ tbody tr:last-child td {
     white-space: nowrap;
 }
 
+.status-registered,
+.status-scheduled,
+.status-in-progress,
+.status-waiting-for-parts,
+.status-completed,
+.status-cancelled {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
 .status-registered {
     background: #E5F0E8;
     color: #24633D;
