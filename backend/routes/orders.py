@@ -2,24 +2,25 @@
 from flask import Blueprint, request, jsonify
 
 from backend.validators.order_validator import validate_repair_order
+
 from backend.services.order_service import (
     create_repair_order,
     get_repair_order_by_id_formatted,
     get_repair_orders,
     search_orders_by_customer,
-    update_order_status
+    update_order_status,
+    get_repair_order_history
 )
 
 
 orders_bp = Blueprint("orders", __name__)
 
 
+# CREATE A REPAIR ORDER
 @orders_bp.route("/orders", methods=["POST"])
 def create_order():
-    # Receive JSON data from the frontend
     data = request.get_json(silent=True)
 
-    # Validate the submitted information
     errors = validate_repair_order(data)
 
     if errors:
@@ -29,7 +30,6 @@ def create_order():
             "errors": errors
         }), 400
 
-    # Create the repair order in SQLite
     order = create_repair_order(data)
 
     return jsonify({
@@ -38,6 +38,8 @@ def create_order():
         "order": order
     }), 201
 
+
+# SEARCH ORDERS BY CUSTOMER NAME
 @orders_bp.route("/orders/search", methods=["GET"])
 def search_orders():
     customer_name = request.args.get("customer_name", "").strip()
@@ -55,9 +57,10 @@ def search_orders():
         "orders": orders
     }), 200
 
+
+# GET ALL REPAIR ORDERS
 @orders_bp.route("/orders", methods=["GET"])
 def get_orders():
-    # Retrieve all orders from SQLite
     orders = get_repair_orders()
 
     return jsonify({
@@ -66,9 +69,9 @@ def get_orders():
     }), 200
 
 
+# GET ONE REPAIR ORDER
 @orders_bp.route("/orders/<int:order_id>", methods=["GET"])
 def get_order(order_id):
-    # Find an order by its ID
     order = get_repair_order_by_id_formatted(order_id)
 
     if order is None:
@@ -83,6 +86,28 @@ def get_order(order_id):
     }), 200
 
 
+# GET REPAIR ORDER STATUS HISTORY
+@orders_bp.route("/orders/<int:order_id>/history", methods=["GET"])
+def get_order_history(order_id):
+
+    order = get_repair_order_by_id_formatted(order_id)
+
+    if order is None:
+        return jsonify({
+            "success": False,
+            "message": "Repair order not found"
+        }), 404
+
+    history = get_repair_order_history(order_id)
+
+    return jsonify({
+        "success": True,
+        "order_id": order_id,
+        "history": history
+    }), 200
+
+
+# UPDATE REPAIR ORDER STATUS
 @orders_bp.route("/orders/<int:order_id>/status", methods=["PATCH"])
 def update_order_status_route(order_id):
     data = request.get_json(silent=True)
@@ -111,7 +136,6 @@ def update_order_status_route(order_id):
             "allowed_statuses": allowed_statuses
         }), 400
 
-    # Update the status in SQLite
     order = update_order_status(order_id, new_status)
 
     if order is None:

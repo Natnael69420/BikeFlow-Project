@@ -4,6 +4,7 @@ from database.db_connection import (
     get_all_repair_orders,
     get_repair_order_by_id,
     search_repair_orders_by_customer,
+    get_order_status_history,
     update_repair_order_status as db_update_repair_order_status
 )
 
@@ -67,6 +68,7 @@ def update_order_status(order_id, new_status):
 
     return format_order(get_repair_order_by_id(order_id))
 
+
 def search_orders_by_customer(customer_name):
     """
     Search repair orders by customer name.
@@ -75,3 +77,16 @@ def search_orders_by_customer(customer_name):
     orders = search_repair_orders_by_customer(customer_name)
 
     return [format_order(order) for order in orders]
+
+
+def get_repair_order_history(order_id):
+    """
+    Retrieve the status history of a repair order.
+    """
+
+    history = get_order_status_history(order_id)
+
+    for record in history:
+        record["changed_at"] = record["changed_at"].replace(" ", "T", 1)
+
+    return history

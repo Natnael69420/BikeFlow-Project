@@ -23,6 +23,8 @@ def validate_repair_order(data):
         value = data.get(field)
 
         if not isinstance(value, str) or not value.strip():
-            errors[field] = f"{field.replace('_', ' ').capitalize()} is required"
+            errors[field] = (
+                f"{field.replace('_', ' ').capitalize()} is required"
+            )
 
     return errors

@@ -19,3 +19,15 @@ CREATE TABLE IF NOT EXISTS repair_orders (
         )),
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Record the history of repair order status changes
+CREATE TABLE IF NOT EXISTS status_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id INTEGER NOT NULL,
+    old_status TEXT,
+    new_status TEXT NOT NULL,
+    changed_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id)
+        REFERENCES repair_orders(id)
+        ON DELETE CASCADE
+);

@@ -1,3 +1,4 @@
+
 """SQLite connection and CRUD helpers for the BikeFlow application."""
 
 from contextlib import contextmanager
@@ -19,17 +20,16 @@ VALID_STATUSES = {
 
 
 def get_connection():
-    """Return a connection to the persistent BikeFlow SQLite database."""
+    """Return a connection to the persistent BikeFlow database."""
     connection = sqlite3.connect(DATABASE_PATH)
     connection.row_factory = sqlite3.Row
-    # Enforce foreign-key constraints if foreign keys are added later.
     connection.execute("PRAGMA foreign_keys = ON")
     return connection
 
 
 @contextmanager
 def database_connection():
-    """Yield a connection; commit on success and roll back on error."""
+    """Commit on success, roll back on error, and close the connection."""
     connection = get_connection()
     try:
         yield connection
@@ -42,13 +42,15 @@ def database_connection():
 
 
 def initialize_database():
-    """Create the database and tables if they do not already exist."""
+    """Create database tables if they do not already exist."""
     try:
         schema = SCHEMA_PATH.read_text(encoding="utf-8")
         with database_connection() as connection:
             connection.executescript(schema)
     except (OSError, sqlite3.Error) as error:
-        raise RuntimeError(f"Could not initialize BikeFlow database: {error}") from error
+        raise RuntimeError(
+            f"Could not initialize BikeFlow database: {error}"
+        ) from error
 
 
 def create_repair_order(
@@ -58,7 +60,8 @@ def create_repair_order(
     bicycle_brand,
     problem_description,
 ):
-    """Insert a repair order and return its newly assigned ID."""
+    """Create an order and record its initial Registered status."""
+
     sql = """
         INSERT INTO repair_orders (
             customer_name,
@@ -68,6 +71,7 @@ def create_repair_order(
             problem_description
         ) VALUES (?, ?, ?, ?, ?)
     """
+
     values = (
         customer_name,
         customer_phone,
@@ -79,28 +83,48 @@ def create_repair_order(
     try:
         with database_connection() as connection:
             cursor = connection.execute(sql, values)
-            return cursor.lastrowid
+            order_id = cursor.lastrowid
+
+            connection.execute(
+                """
+                INSERT INTO status_history (
+                    order_id,
+                    old_status,
+                    new_status
+                ) VALUES (?, NULL, ?)
+                """,
+                (order_id, "Registered"),
+            )
+
+            return order_id
+
     except sqlite3.IntegrityError as error:
         raise ValueError(f"Invalid repair order data: {error}") from error
 
 
 def get_all_repair_orders():
-    """Return all repair orders as dictionaries, newest first."""
+    """Return all repair orders, newest first."""
     with database_connection() as connection:
         rows = connection.execute(
-            "SELECT * FROM repair_orders ORDER BY created_at DESC, id DESC"
+            """
+            SELECT * FROM repair_orders
+            ORDER BY created_at DESC, id DESC
+            """
         ).fetchall()
+
         return [dict(row) for row in rows]
 
 
 def get_repair_order_by_id(order_id):
-    """Return one repair order as a dictionary, or None if not found."""
+    """Return one repair order or None if not found."""
     with database_connection() as connection:
         row = connection.execute(
             "SELECT * FROM repair_orders WHERE id = ?",
             (order_id,),
         ).fetchone()
+
         return dict(row) if row else None
+
 
 def search_repair_orders_by_customer(customer_name):
     """Find repair orders matching a customer name."""
@@ -118,7 +142,8 @@ def search_repair_orders_by_customer(customer_name):
 
 
 def update_repair_order_status(order_id, new_status):
-    """Update an order status; return True if a row was updated."""
+    """Update an order status and record the change in history."""
+
     if new_status not in VALID_STATUSES:
         raise ValueError(
             f"Invalid status. Choose one of: {', '.join(sorted(VALID_STATUSES))}"
@@ -126,13 +151,67 @@ def update_repair_order_status(order_id, new_status):
 
     try:
         with database_connection() as connection:
-            cursor = connection.execute(
-                "UPDATE repair_orders SET status = ? WHERE id = ?",
+
+            # Find the existing order and its current status
+            row = connection.execute(
+                "SELECT status FROM repair_orders WHERE id = ?",
+                (order_id,),
+            ).fetchone()
+
+            if row is None:
+                return False
+
+            old_status = row["status"]
+
+            # Do not record duplicate status changes
+            if old_status == new_status:
+                return True
+
+            # Update the order
+            connection.execute(
+                """
+                UPDATE repair_orders
+                SET status = ?
+                WHERE id = ?
+                """,
                 (new_status, order_id),
             )
-            return cursor.rowcount > 0
+
+            # Record the status change
+            connection.execute(
+                """
+                INSERT INTO status_history (
+                    order_id,
+                    old_status,
+                    new_status
+                ) VALUES (?, ?, ?)
+                """,
+                (order_id, old_status, new_status),
+            )
+
+            return True
+
     except sqlite3.IntegrityError as error:
-        raise ValueError(f"Could not update repair order: {error}") from error
+        raise ValueError(
+            f"Could not update repair order: {error}"
+        ) from error
+
+
+def get_order_status_history(order_id):
+    """Return the complete status history for one repair order."""
+
+    with database_connection() as connection:
+        rows = connection.execute(
+            """
+            SELECT id, order_id, old_status, new_status, changed_at
+            FROM status_history
+            WHERE order_id = ?
+            ORDER BY id ASC
+            """,
+            (order_id,),
+        ).fetchall()
+
+        return [dict(row) for row in rows]
 
 
 if __name__ == "__main__":
