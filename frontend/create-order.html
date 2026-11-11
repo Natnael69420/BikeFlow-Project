@@ -1,1 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BikeFlow | Create Order</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-layout">
 
+        <aside class="sidebar">
+            <div class="brand">
+                <h2>BikeFlow</h2>
+                <p class="brand-subtitle">Bicycle Service Management</p>
+            </div>
+
+            <p class="sidebar-label">MENU</p>
+
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-link">Dashboard</a>
+                <a href="orders.html" class="nav-link">Repair Orders</a>
+                <a href="create-order.html" class="nav-link active">Create Order</a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <p>BikeFlow MVP</p>
+            </div>
+        </aside>
+
+        <main class="main-content">
+
+            <header class="topbar">
+                <div>
+                    <h1 class="topbar-title">Create Repair Order</h1>
+                    <p class="topbar-subtitle">Register a new bicycle repair request</p>
+                </div>
+
+                <div class="user-profile">
+                    <div class="user-avatar">A</div>
+                    <span>Augusta</span>
+                </div>
+            </header>
+
+            <section class="container">
+
+                <div class="page-header">
+                    <div>
+                        <h2 class="page-title">New Repair Order</h2>
+                        <p class="page-description">
+                            Enter the customer and bicycle information below.
+                        </p>
+                    </div>
+
+                    <a href="orders.html" class="btn btn-secondary">
+                        Back to Orders
+                    </a>
+                </div>
+
+                <section class="card form-container">
+
+                    <div class="card-header">
+                        <h3 class="card-title">Customer and Bicycle Information</h3>
+                    </div>
+
+                    <div id="form-message" class="alert" hidden></div>
+
+                    <form id="create-order-form">
+
+                        <div class="form-grid">
+
+                            <div class="form-group">
+                                <label for="customer-name">Customer Name *</label>
+                                <input
+                                    type="text"
+                                    id="customer-name"
+                                    name="customer_name"
+                                    class="form-control"
+                                    placeholder="Enter customer name"
+                                    maxlength="100"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="customer-phone">Customer Phone *</label>
+                                <input
+                                    type="tel"
+                                    id="customer-phone"
+                                    name="customer_phone"
+                                    class="form-control"
+                                    placeholder="Enter phone number"
+                                    maxlength="30"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="bicycle-type">Bicycle Type *</label>
+                                <select
+                                    id="bicycle-type"
+                                    name="bicycle_type"
+                                    class="form-control"
+                                    required
+                                >
+                                    <option value="">Select bicycle type</option>
+                                    <option value="Mountain Bike">Mountain Bike</option>
+                                    <option value="Road Bike">Road Bike</option>
+                                    <option value="Hybrid Bike">Hybrid Bike</option>
+                                    <option value="City Bike">City Bike</option>
+                                    <option value="Electric Bike">Electric Bike</option>
+                                    <option value="BMX">BMX</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="bicycle-brand">Bicycle Brand *</label>
+                                <input
+                                    type="text"
+                                    id="bicycle-brand"
+                                    name="bicycle_brand"
+                                    class="form-control"
+                                    placeholder="e.g. Trek, Giant, Specialized"
+                                    maxlength="100"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="problem-description">
+                                    Problem Description *
+                                </label>
+
+                                <textarea
+                                    id="problem-description"
+                                    name="problem_description"
+                                    class="form-control"
+                                    rows="5"
+                                    placeholder="Describe the bicycle problem..."
+                                    maxlength="1000"
+                                    required
+                                ></textarea>
+                            </div>
+
+                        </div>
+
+                        <div class="form-actions">
+                            <a href="orders.html" class="btn btn-secondary">
+                                Cancel
+                            </a>
+
+                            <button
+                                type="submit"
+                                id="submit-order-button"
+                                class="btn btn-primary"
+                            >
+                                Create Repair Order
+                            </button>
+                        </div>
+
+                    </form>
+                </section>
+
+                <footer class="page-footer">
+                    BikeFlow Bicycle Service Management System
+                </footer>
+
+            </section>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const form = document.getElementById("create-order-form");
+            const message = document.getElementById("form-message");
+            const submitButton = document.getElementById("submit-order-button");
+
+            function showMessage(text, type) {
+                message.textContent = text;
+                message.className = `alert alert-${type}`;
+                message.hidden = false;
+            }
+
+            form.addEventListener("submit", async event => {
+                event.preventDefault();
+
+                if (!form.reportValidity()) {
+                    return;
+                }
+
+                const formData = new FormData(form);
+
+                const orderData = {
+                    customer_name: formData.get("customer_name").trim(),
+                    customer_phone: formData.get("customer_phone").trim(),
+                    bicycle_type: formData.get("bicycle_type"),
+                    bicycle_brand: formData.get("bicycle_brand").trim(),
+                    problem_description: formData.get("problem_description").trim()
+                };
+
+                if (Object.values(orderData).some(value => !value)) {
+                    showMessage("Please complete all required fields.", "error");
+                    return;
+                }
+
+                submitButton.disabled = true;
+                submitButton.textContent = "Creating Order...";
+
+                try {
+                    const result = await BikeFlow.apiRequest("/orders", {
+                        method: "POST",
+                        body: JSON.stringify(orderData)
+                    });
+
+                    showMessage(
+                        result.message || "Repair order created successfully.",
+                        "success"
+                    );
+
+                    form.reset();
+
+                    setTimeout(() => {
+                        window.location.href = "orders.html";
+                    }, 1200);
+
+                } catch (error) {
+                    showMessage(error.message, "error");
+
+                } finally {
+                    submitButton.disabled = false;
+                    submitButton.textContent = "Create Repair Order";
+                }
+            });
+        });
+    </script>
+</body>
+</html>
