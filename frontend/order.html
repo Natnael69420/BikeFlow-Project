@@ -225,18 +225,18 @@
                 updateButton.textContent = "Updating...";
 
                 try {
-                    await BikeFlow.apiRequest(
-                        `/orders/${encodeURIComponent(orderId)}/status`,
-                        {
-                            method: "PATCH",
-                            body: JSON.stringify({
-                                status: newStatus
-                            })
-                        }
-                    );
+                    const result = await BikeFlow.apiRequest(
+    `/orders/${encodeURIComponent(orderId)}/status`,
+    {
+        method: "PATCH",
+        body: JSON.stringify({
+            status: newStatus
+        })
+    }
+);
 
-                    currentOrder.status = newStatus;
-                    displayOrder(currentOrder);
+currentOrder.status = result.order.status;
+displayOrder(currentOrder);
 
                     showMessage("Repair order status updated successfully.", "success");
 
