@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BikeFlow | Order Details</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-layout">
+
+        <aside class="sidebar">
+            <div class="brand">
+                <h2>BikeFlow</h2>
+                <p class="brand-subtitle">Bicycle Service Management</p>
+            </div>
+
+            <p class="sidebar-label">MENU</p>
+
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-link">Dashboard</a>
+                <a href="orders.html" class="nav-link active">Repair Orders</a>
+                <a href="create-order.html" class="nav-link">Create Order</a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <p>BikeFlow MVP</p>
+            </div>
+        </aside>
+
+        <main class="main-content">
+
+            <header class="topbar">
+                <div>
+                    <h1 class="topbar-title">Order Details</h1>
+                    <p class="topbar-subtitle">View and update repair information</p>
+                </div>
+
+                <div class="user-profile">
+                    <div class="user-avatar">A</div>
+                    <span>Augusta</span>
+                </div>
+            </header>
+
+            <section class="container">
+
+                <div class="page-header">
+                    <div>
+                        <h2 class="page-title">Repair Order Details</h2>
+                        <p class="page-description">
+                            Complete information about this repair request.
+                        </p>
+                    </div>
+
+                    <a href="orders.html" class="btn btn-secondary">
+                        Back to Orders
+                    </a>
+                </div>
+
+                <div id="order-message" class="alert alert-info">
+                    Loading order details...
+                </div>
+
+                <section class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            Order #<span id="order-id">—</span>
+                        </h3>
+
+                        <span id="order-status" class="status-registered">
+                            —
+                        </span>
+                    </div>
+
+                    <div class="details-grid">
+
+                        <div class="detail-item">
+                            <p class="detail-label">Customer Name</p>
+                            <p class="detail-value" id="customer-name">—</p>
+                        </div>
+
+                        <div class="detail-item">
+                            <p class="detail-label">Customer Phone</p>
+                            <p class="detail-value" id="customer-phone">—</p>
+                        </div>
+
+                        <div class="detail-item">
+                            <p class="detail-label">Bicycle Type</p>
+                            <p class="detail-value" id="bicycle-type">—</p>
+                        </div>
+
+                        <div class="detail-item">
+                            <p class="detail-label">Bicycle Brand</p>
+                            <p class="detail-value" id="bicycle-brand">—</p>
+                        </div>
+
+                        <div class="detail-item">
+                            <p class="detail-label">Date Created</p>
+                            <p class="detail-value" id="created-at">—</p>
+                        </div>
+
+                        <div class="detail-item full-width">
+                            <p class="detail-label">Problem Description</p>
+                            <p class="detail-value" id="problem-description">—</p>
+                        </div>
+
+                    </div>
+                </section>
+
+                <section class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Update Repair Status</h3>
+                    </div>
+
+                    <form id="status-form">
+                        <div class="form-group">
+                            <label for="new-status">Select New Status</label>
+
+                            <select
+                                id="new-status"
+                                class="form-control"
+                                required
+                            >
+                                <option value="Registered">Registered</option>
+                                <option value="Scheduled">Scheduled</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Waiting for Parts">Waiting for Parts</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
+
+                        <div class="form-actions">
+                            <button
+                                type="submit"
+                                id="update-status-button"
+                                class="btn btn-primary"
+                            >
+                                Update Status
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <footer class="page-footer">
+                    BikeFlow Bicycle Service Management System
+                </footer>
+
+            </section>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const message = document.getElementById("order-message");
+            const statusForm = document.getElementById("status-form");
+            const statusSelect = document.getElementById("new-status");
+            const updateButton = document.getElementById("update-status-button");
+
+            const orderId = new URLSearchParams(window.location.search)
+                .get("id");
+
+            let currentOrder = null;
+
+            function showMessage(text, type = "info") {
+                message.textContent = text;
+                message.className = `alert alert-${type}`;
+            }
+
+            function displayOrder(order) {
+                document.getElementById("order-id").textContent = order.id;
+                document.getElementById("customer-name").textContent =
+                    order.customer_name || "—";
+                document.getElementById("customer-phone").textContent =
+                    order.customer_phone || "—";
+                document.getElementById("bicycle-type").textContent =
+                    order.bicycle_type || "—";
+                document.getElementById("bicycle-brand").textContent =
+                    order.bicycle_brand || "—";
+                document.getElementById("problem-description").textContent =
+                    order.problem_description || "—";
+                document.getElementById("created-at").textContent =
+                    BikeFlow.formatDate(order.created_at);
+
+                const statusElement = document.getElementById("order-status");
+
+                statusElement.textContent = order.status;
+                statusElement.className =
+                    BikeFlow.getStatusClass(order.status);
+
+                statusSelect.value = order.status;
+            }
+
+            async function loadOrder() {
+                if (!orderId) {
+                    showMessage("No repair order ID was provided.", "error");
+                    statusForm.hidden = true;
+                    return;
+                }
+
+                try {
+                    currentOrder = await BikeFlow.getOrderById(orderId);
+                    displayOrder(currentOrder);
+
+                    showMessage("Order details loaded successfully.", "success");
+
+                } catch (error) {
+                    showMessage(error.message, "error");
+                    statusForm.hidden = true;
+                }
+            }
+
+            statusForm.addEventListener("submit", async event => {
+                event.preventDefault();
+
+                if (!currentOrder) {
+                    return;
+                }
+
+                const newStatus = statusSelect.value;
+
+                updateButton.disabled = true;
+                updateButton.textContent = "Updating...";
+
+                try {
+                    await BikeFlow.apiRequest(
+                        `/orders/${encodeURIComponent(orderId)}/status`,
+                        {
+                            method: "PATCH",
+                            body: JSON.stringify({
+                                status: newStatus
+                            })
+                        }
+                    );
+
+                    currentOrder.status = newStatus;
+                    displayOrder(currentOrder);
+
+                    showMessage("Repair order status updated successfully.", "success");
+
+                } catch (error) {
+                    statusSelect.value = currentOrder.status;
+                    showMessage(error.message, "error");
+
+                } finally {
+                    updateButton.disabled = false;
+                    updateButton.textContent = "Update Status";
+                }
+            });
+
+            loadOrder();
+        });
+    </script>
+</body>
+</html>
