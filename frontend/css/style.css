@@ -1,1 +1,634 @@
+/* =========================================
+   BIKEFLOW - BICYCLE SERVICE MANAGEMENT
+   Frontend stylesheet
+   ========================================= */
 
+/* 1. DESIGN SYSTEM */
+
+:root {
+    --primary: #163D32;
+    --primary-light: #245C49;
+    --accent: #B9DCC8;
+
+    --background: #F3F6F4;
+    --surface: #FFFFFF;
+    --border: #E3EAE5;
+
+    --text: #24332B;
+    --muted: #78877E;
+
+    --success: #198754;
+    --warning: #D99A27;
+    --danger: #D9534F;
+    --info: #3985C6;
+
+    --radius: 12px;
+    --shadow: 0 3px 14px rgba(22, 61, 50, 0.06);
+}
+
+/* 2. RESET */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--background);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.container {
+    width: 100%;
+    max-width: 1440px;
+    margin: auto;
+    padding: 30px;
+}
+
+/* 3. APPLICATION LAYOUT */
+
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 250px;
+    min-width: 250px;
+    background: var(--primary);
+    color: white;
+    padding: 28px 18px;
+    display: flex;
+    flex-direction: column;
+}
+
+.brand {
+    font-size: 25px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    padding: 0 12px;
+    margin-bottom: 8px;
+}
+
+.brand-subtitle {
+    color: #C4D8CC;
+    font-size: 11px;
+    padding: 0 12px;
+    margin-bottom: 40px;
+}
+
+.sidebar-label {
+    color: #A8C5B4;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 0 12px;
+    margin-bottom: 12px;
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.nav-link {
+    display: block;
+    color: #D8E5DC;
+    padding: 12px;
+    border-radius: 8px;
+    transition: 0.2s ease;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    background: var(--primary-light);
+    color: white;
+}
+
+.sidebar-footer {
+    margin-top: auto;
+    padding: 20px 12px 0;
+    color: #C4D8CC;
+    font-size: 12px;
+}
+
+.main-content {
+    flex: 1;
+    min-width: 0;
+}
+
+/* 4. TOP HEADER */
+
+.topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.topbar-title {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.topbar-subtitle {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-avatar {
+    width: 38px;
+    height: 38px;
+    background: var(--accent);
+    color: var(--primary);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-weight: bold;
+}
+
+/* 5. PAGE HEADINGS */
+
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 26px;
+    flex-wrap: wrap;
+}
+
+.page-title {
+    font-size: 26px;
+    font-weight: 750;
+    color: var(--primary);
+}
+
+.page-description {
+    color: var(--muted);
+    margin-top: 4px;
+}
+
+/* 6. DASHBOARD STATISTICS */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 28px;
+}
+
+.stat-card {
+    background: var(--surface);
+    padding: 22px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.stat-label {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+.stat-value {
+    font-size: 30px;
+    font-weight: 750;
+    color: var(--primary);
+}
+
+.stat-note {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* 7. GENERAL CARDS */
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 22px;
+    margin-bottom: 22px;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.card-title {
+    font-size: 17px;
+    font-weight: 700;
+}
+
+/* 8. BUTTONS */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 18px;
+    font-weight: 600;
+    transition: 0.2s ease;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary-light);
+}
+
+.btn-secondary {
+    background: #E9F0EC;
+    color: var(--primary);
+}
+
+.btn-secondary:hover {
+    background: #DCE9E0;
+}
+
+.btn-danger {
+    background: #FCE8E7;
+    color: var(--danger);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* 9. TABLES */
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 650px;
+}
+
+thead {
+    background: #F5F8F6;
+}
+
+th {
+    color: var(--muted);
+    font-size: 11px;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 14px 12px;
+}
+
+td {
+    padding: 15px 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+tbody tr:hover {
+    background: #FAFCFA;
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* 10. REPAIR STATUS BADGES */
+
+.status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.status-registered {
+    background: #E5F0E8;
+    color: #24633D;
+}
+
+.status-scheduled {
+    background: #E5EFFB;
+    color: #28619C;
+}
+
+.status-in-progress {
+    background: #FFF1D6;
+    color: #986414;
+}
+
+.status-waiting-for-parts {
+    background: #F1E9FA;
+    color: #7547A0;
+}
+
+.status-completed {
+    background: #DDF3E7;
+    color: #187343;
+}
+
+.status-cancelled {
+    background: #FCE8E7;
+    color: #AE3935;
+}
+
+/* 11. FORMS */
+
+.form-container {
+    max-width: 850px;
+    margin: 0 auto;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-bottom: 18px;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: white;
+    outline: none;
+    transition: 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(36, 92, 73, 0.1);
+}
+
+textarea.form-control {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 12px;
+}
+
+/* 12. SEARCH AND FILTERS */
+
+.toolbar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.search-input {
+    flex: 1;
+    min-width: 200px;
+}
+
+/* 13. ALERT MESSAGES */
+
+.alert {
+    padding: 13px 16px;
+    border-radius: 8px;
+    margin-bottom: 18px;
+}
+
+.alert-success {
+    background: #E4F5E9;
+    color: #24633D;
+}
+
+.alert-error {
+    background: #FCE8E7;
+    color: #AE3935;
+}
+
+.alert-info {
+    background: #E6F1FC;
+    color: #28619C;
+}
+
+.field-error {
+    color: var(--danger);
+    font-size: 12px;
+}
+
+/* 14. ORDER DETAILS */
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.detail-item {
+    padding: 14px;
+    background: #F7F9F7;
+    border-radius: 8px;
+}
+
+.detail-label {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.detail-value {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+/* 15. EMPTY STATES */
+
+.empty-state {
+    text-align: center;
+    padding: 45px 20px;
+    color: var(--muted);
+}
+
+.empty-state h3 {
+    color: var(--primary);
+    margin-bottom: 8px;
+}
+
+/* 16. LOADING */
+
+.loading {
+    text-align: center;
+    padding: 30px;
+    color: var(--muted);
+}
+
+/* 17. FOOTER */
+
+.page-footer {
+    text-align: center;
+    padding: 25px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+/* 18. RESPONSIVE DESIGN */
+
+@media (max-width: 1000px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .sidebar {
+        width: 210px;
+        min-width: 210px;
+    }
+
+    .container {
+        padding: 22px;
+    }
+}
+
+@media (max-width: 700px) {
+    .app-layout {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        min-width: 0;
+        padding: 16px;
+    }
+
+    .brand-subtitle,
+    .sidebar-label,
+    .sidebar-footer {
+        display: none;
+    }
+
+    .brand {
+        margin-bottom: 12px;
+    }
+
+    .nav-menu {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .nav-link {
+        padding: 9px 12px;
+        font-size: 12px;
+    }
+
+    .topbar {
+        padding: 15px 20px;
+    }
+
+    .container {
+        padding: 18px;
+    }
+
+    .page-title {
+        font-size: 22px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 15px;
+    }
+
+    .stat-value {
+        font-size: 24px;
+    }
+
+    .form-grid,
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group.full-width {
+        grid-column: auto;
+    }
+}
+
+@media (max-width: 400px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+    }
+}
