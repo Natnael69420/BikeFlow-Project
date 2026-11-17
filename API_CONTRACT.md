@@ -5,7 +5,7 @@
 **Document:** API Contract  
 **Version:** 1.1 (Proposed Update)  
 **Previous Version:** 1.0  
-**Status:** Pending team approval
+**Status:** Agreed by all three developers
 
 ## 1. Introduction
 
@@ -225,7 +225,7 @@ Responsible for:
 - Implementing JavaScript functionality.
 - Creating repair order registration forms.
 - Displaying repair orders and details.
-- Sending API requests.
+- Sending API requests.3457689kgj. v768asdf
 - Displaying status history.
 - Implementing editing and cancellation interfaces.
 - Displaying success and error messages.
@@ -297,7 +297,7 @@ All three developers should follow the agreed API contract, coordinate changes, 
 This document proposes an update to API Contract Version 1.0.
 
 **Version:** 1.1  
-**Status:** Pending approval by all three developers.
+**Status:** Approved and agreed by all three developers.
 
 **Team responsibilities:**
 - Natnael – Backend Developer
