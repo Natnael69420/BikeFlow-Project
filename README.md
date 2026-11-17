@@ -85,6 +85,15 @@ API base URL: `http://127.0.0.1:5000/api`
 | GET | /api/orders/{id}/history | Retrieve status history |
 | GET | /api/orders/status-transitions | Retrieve permitted transitions |
 
+### API Contract Approval
+
+The API contract (Version 1.1) was reviewed and approved by all three developers:
+
+- Augusta – Frontend Developer
+- Natnael – Backend Developer
+- Soheib – Database Developer
+
+The agreed contract is documented in `API_CONTRACT.md`.
 ## 6. Business Workflow
 
 The backend enforces permitted status transitions.
@@ -100,6 +109,8 @@ The backend enforces permitted status transitions.
 
 ### Implemented business rules
 
+- Frontend status history display with automatic refresh after status updates.
+- Responsive frontend integration across Dashboard, Repair Orders, Create Order and Order Details pages.
 1. Only permitted status transitions are accepted.
 2. Completed orders cannot return to earlier repair stages.
 3. Cancelled orders cannot return to the normal repair workflow.
@@ -158,6 +169,25 @@ Verified functionality:
 | Update nonexistent order | HTTP 404 | Passed |
 | Repeat current status | No duplicate history | Passed |
 
+### Frontend Integration Testing
+
+The frontend and backend were tested together.
+
+| Test | Actual result |
+|---|---|
+| Dashboard statistics and recent orders | Passed |
+| Repair orders loading and refresh | Passed |
+| Search and status filtering | Passed |
+| Create repair order | Passed |
+| View order details | Passed |
+| Update repair status | Passed |
+| Form and phone validation | Passed |
+| Data persistence after page refresh | Passed |
+| Mobile responsiveness | Passed |
+| Backend connection error handling | Passed |
+| Status history display and automatic refresh | Passed |
+
+All listed integration tests passed during manual testing.
 ## 9. Current Implementation Status
 
 ### Implemented
@@ -181,7 +211,7 @@ Verified functionality:
 ## 10. Team Responsibilities
 
 - **Natnael – Backend Developer:** Flask API, validation, business logic, workflow implementation and backend testing.
-- **Augsta – Frontend Developer:** HTML, CSS, JavaScript, user interface and frontend/API integration.
+- **Augusta – Frontend Developer:** HTML, CSS, JavaScript, user interface and frontend/API integration.
 - **Soheib – Database Developer:** SQLite database, schema, database operations and persistence.
 
 ## 11. Repository
