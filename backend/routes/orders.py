@@ -5,11 +5,13 @@ from backend.validators.order_validator import validate_repair_order
 
 from backend.services.order_service import (
     create_repair_order,
+    edit_repair_order,
     get_repair_order_by_id_formatted,
     get_repair_orders,
     search_orders_by_customer,
     update_order_status,
-    get_repair_order_history
+    get_repair_order_history,
+    get_allowed_status_transitions
 )
 
 
@@ -30,13 +32,20 @@ def create_order():
             "errors": errors
         }), 400
 
-    order = create_repair_order(data)
+    try:
+        order = create_repair_order(data)
 
-    return jsonify({
-        "success": True,
-        "message": "Repair order created successfully",
-        "order": order
-    }), 201
+        return jsonify({
+            "success": True,
+            "message": "Repair order created successfully",
+            "order": order
+        }), 201
+
+    except (ValueError, TypeError) as error:
+        return jsonify({
+            "success": False,
+            "message": str(error)
+        }), 400
 
 
 # SEARCH ORDERS BY CUSTOMER NAME
@@ -86,10 +95,45 @@ def get_order(order_id):
     }), 200
 
 
+# EDIT REPAIR ORDER DETAILS
+@orders_bp.route("/orders/<int:order_id>", methods=["PUT"])
+def edit_order(order_id):
+    data = request.get_json(silent=True)
+
+    errors = validate_repair_order(data)
+
+    if errors:
+        return jsonify({
+            "success": False,
+            "message": "Validation failed",
+            "errors": errors
+        }), 400
+
+    try:
+        order = edit_repair_order(order_id, data)
+
+        if order is None:
+            return jsonify({
+                "success": False,
+                "message": "Repair order not found"
+            }), 404
+
+        return jsonify({
+            "success": True,
+            "message": "Repair order details updated successfully",
+            "order": order
+        }), 200
+
+    except (ValueError, TypeError) as error:
+        return jsonify({
+            "success": False,
+            "message": str(error)
+        }), 400
+
+
 # GET REPAIR ORDER STATUS HISTORY
 @orders_bp.route("/orders/<int:order_id>/history", methods=["GET"])
 def get_order_history(order_id):
-
     order = get_repair_order_by_id_formatted(order_id)
 
     if order is None:
@@ -104,6 +148,15 @@ def get_order_history(order_id):
         "success": True,
         "order_id": order_id,
         "history": history
+    }), 200
+
+
+# GET PERMITTED STATUS TRANSITIONS
+@orders_bp.route("/orders/status-transitions", methods=["GET"])
+def get_status_transitions():
+    return jsonify({
+        "success": True,
+        "transitions": get_allowed_status_transitions()
     }), 200
 
 
@@ -136,16 +189,23 @@ def update_order_status_route(order_id):
             "allowed_statuses": allowed_statuses
         }), 400
 
-    order = update_order_status(order_id, new_status)
+    try:
+        order = update_order_status(order_id, new_status)
 
-    if order is None:
+        if order is None:
+            return jsonify({
+                "success": False,
+                "message": "Repair order not found"
+            }), 404
+
+        return jsonify({
+            "success": True,
+            "message": "Repair order status updated successfully",
+            "order": order
+        }), 200
+
+    except ValueError as error:
         return jsonify({
             "success": False,
-            "message": "Repair order not found"
-        }), 404
-
-    return jsonify({
-        "success": True,
-        "message": "Repair order status updated successfully",
-        "order": order
-    }), 200
+            "message": str(error)
+        }), 400

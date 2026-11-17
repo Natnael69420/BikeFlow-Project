@@ -141,6 +141,47 @@ def search_repair_orders_by_customer(customer_name):
         return [dict(row) for row in rows]
 
 
+def update_repair_order_details(
+    order_id,
+    customer_name,
+    customer_phone,
+    bicycle_type,
+    bicycle_brand,
+    problem_description,
+):
+    """Update the customer and bicycle details of an existing order."""
+
+    sql = """
+        UPDATE repair_orders
+        SET
+            customer_name = ?,
+            customer_phone = ?,
+            bicycle_type = ?,
+            bicycle_brand = ?,
+            problem_description = ?
+        WHERE id = ?
+    """
+
+    values = (
+        customer_name,
+        customer_phone,
+        bicycle_type,
+        bicycle_brand,
+        problem_description,
+        order_id,
+    )
+
+    try:
+        with database_connection() as connection:
+            cursor = connection.execute(sql, values)
+            return cursor.rowcount > 0
+
+    except sqlite3.IntegrityError as error:
+        raise ValueError(
+            f"Could not update repair order details: {error}"
+        ) from error
+
+
 def update_repair_order_status(order_id, new_status):
     """Update an order status and record the change in history."""
 
@@ -152,7 +193,6 @@ def update_repair_order_status(order_id, new_status):
     try:
         with database_connection() as connection:
 
-            # Find the existing order and its current status
             row = connection.execute(
                 "SELECT status FROM repair_orders WHERE id = ?",
                 (order_id,),
@@ -163,11 +203,9 @@ def update_repair_order_status(order_id, new_status):
 
             old_status = row["status"]
 
-            # Do not record duplicate status changes
             if old_status == new_status:
                 return True
 
-            # Update the order
             connection.execute(
                 """
                 UPDATE repair_orders
@@ -177,7 +215,6 @@ def update_repair_order_status(order_id, new_status):
                 (new_status, order_id),
             )
 
-            # Record the status change
             connection.execute(
                 """
                 INSERT INTO status_history (
