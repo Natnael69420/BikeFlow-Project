@@ -59,23 +59,37 @@
 
                 <section class="card">
 
-                    <div class="toolbar">
-                        <input
-                            type="search"
-                            id="order-search"
-                            class="search-input"
-                            placeholder="Search by customer or bicycle..."
-                            aria-label="Search repair orders"
-                        >
+                 <div class="toolbar">
+    <input
+        type="search"
+        id="order-search"
+        class="search-input"
+        placeholder="Search by customer or bicycle..."
+        aria-label="Search repair orders"
+    >
 
-                        <button
-                            type="button"
-                            class="btn btn-secondary"
-                            id="refresh-orders"
-                        >
-                            Refresh
-                        </button>
-                    </div>
+    <select
+        id="status-filter"
+        class="search-input"
+        aria-label="Filter orders by status"
+    >
+        <option value="">All Statuses</option>
+        <option value="Registered">Registered</option>
+        <option value="Scheduled">Scheduled</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Waiting for Parts">Waiting for Parts</option>
+        <option value="Completed">Completed</option>
+        <option value="Cancelled">Cancelled</option>
+    </select>
+
+    <button
+        type="button"
+        class="btn btn-secondary"
+        id="refresh-orders"
+    >
+        Refresh
+    </button>
+</div>
 
                     <div id="orders-message" class="alert alert-info">
                         Loading repair orders...
@@ -175,24 +189,29 @@
             }
 
             function filterOrders() {
-                const searchTerm = searchInput.value
-                    .trim()
-                    .toLowerCase();
+    const searchTerm = searchInput.value
+        .trim()
+        .toLowerCase();
 
-                const filteredOrders = allOrders.filter(order => {
-                    const searchableText = [
-                        order.id,
-                        order.customer_name,
-                        order.customer_phone,
-                        order.bicycle_brand,
-                        order.bicycle_type
-                    ].join(" ").toLowerCase();
+    const selectedStatus = document.getElementById("status-filter").value;
 
-                    return searchableText.includes(searchTerm);
-                });
+    const filteredOrders = allOrders.filter(order => {
+        const searchableText = [
+            order.id,
+            order.customer_name,
+            order.customer_phone,
+            order.bicycle_brand,
+            order.bicycle_type
+        ].join(" ").toLowerCase();
 
-                renderOrders(filteredOrders);
-            }
+        const matchesSearch = searchableText.includes(searchTerm);
+        const matchesStatus = selectedStatus === "" || order.status === selectedStatus;
+
+        return matchesSearch && matchesStatus;
+    });
+
+    renderOrders(filteredOrders);
+}
 
             async function loadOrders() {
                 showMessage("Loading repair orders...");
@@ -227,6 +246,7 @@
             }
 
             searchInput.addEventListener("input", filterOrders);
+            document.getElementById("status-filter").addEventListener("change", filterOrders);
             refreshButton.addEventListener("click", loadOrders);
 
             loadOrders();

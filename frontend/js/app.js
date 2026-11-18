@@ -1,5 +1,4 @@
-const API_BASE_URL = "http://127.0.0.1:5000/api";
-
+const API_BASE_URL = "https://fictional-rotary-phone-r7xpgjrp4rpwhwj9v-5000.app.github.dev/api";
 /* ------------------------------
    Shared API functions
 ------------------------------ */

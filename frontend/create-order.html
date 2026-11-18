@@ -85,14 +85,17 @@
                             <div class="form-group">
                                 <label for="customer-phone">Customer Phone *</label>
                                 <input
-                                    type="tel"
-                                    id="customer-phone"
-                                    name="customer_phone"
-                                    class="form-control"
-                                    placeholder="Enter phone number"
-                                    maxlength="30"
-                                    required
-                                >
+    type="tel"
+    id="customer-phone"
+    name="customer_phone"
+    class="form-control"
+    placeholder="Enter phone number"
+    maxlength="30"
+pattern="\+?[0-9][0-9 .\-]{6,28}"
+    title="Enter a valid phone number using at least 7 characters. Letters are not allowed."
+    required
+>
+                                
                             </div>
 
                             <div class="form-group">
@@ -101,7 +104,7 @@
                                     id="bicycle-type"
                                     name="bicycle_type"
                                     class="form-control"
-                                    required
+                                      required
                                 >
                                     <option value="">Select bicycle type</option>
                                     <option value="Mountain Bike">Mountain Bike</option>

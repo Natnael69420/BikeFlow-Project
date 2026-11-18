@@ -142,6 +142,16 @@
                     </form>
                 </section>
 
+                <section class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Status History</h3>
+                    </div>
+
+                    <div id="status-history">
+                        Loading status history...
+                    </div>
+                </section>
+
                 <footer class="page-footer">
                     BikeFlow Bicycle Service Management System
                 </footer>
@@ -164,6 +174,39 @@
 
             let currentOrder = null;
 
+            async function loadStatusHistory() {
+                const historyContainer = document.getElementById("status-history");
+
+                historyContainer.textContent = "Loading status history...";
+
+                try {
+                    const result = await BikeFlow.apiRequest(
+                        `/orders/${encodeURIComponent(orderId)}/history`
+                    );
+
+                    if (!result.history || result.history.length === 0) {
+                        historyContainer.textContent = "No status history available.";
+                        return;
+                    }
+
+                    historyContainer.innerHTML = result.history.map(entry => {
+                        const oldStatus = entry.old_status || "Initial status";
+
+                        const changedAt = BikeFlow.formatDate(entry.changed_at);
+
+                        return `
+                            <div class="detail-item">
+                                <p class="detail-label">${oldStatus} → ${entry.new_status}</p>
+                                <p class="detail-value">${changedAt}</p>
+                            </div>
+                        `;
+                    }).join("");
+
+                } catch (error) {
+                    historyContainer.textContent =
+                        "Unable to load status history: " + error.message;
+                }
+            }
             function showMessage(text, type = "info") {
                 message.textContent = text;
                 message.className = `alert alert-${type}`;
@@ -203,6 +246,7 @@
                 try {
                     currentOrder = await BikeFlow.getOrderById(orderId);
                     displayOrder(currentOrder);
+                    await loadStatusHistory();
 
                     showMessage("Order details loaded successfully.", "success");
 
@@ -237,7 +281,7 @@
 
 currentOrder.status = result.order.status;
 displayOrder(currentOrder);
-
+await loadStatusHistory();
                     showMessage("Repair order status updated successfully.", "success");
 
                 } catch (error) {
